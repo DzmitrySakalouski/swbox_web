@@ -171,7 +171,7 @@ export function SignUpComponent(props) {
                         className={classes.submit}
                         onClick={logIn}
                     >
-                        Sign Up
+                        Зарегестрироваться
                     </Button>
 
                 </Container>

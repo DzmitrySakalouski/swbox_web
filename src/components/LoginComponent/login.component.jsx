@@ -123,7 +123,7 @@ export function LoginComponent(props) {
                         className={classes.submit}
                         onClick={logInHandler}
                     >
-                        Sign In
+                        Войти
                     </Button>
 
                 </Container>
