@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import firebase from 'firebase';
 import { Container } from '@material-ui/core';
+import { useAlert } from 'react-alert';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -48,6 +46,7 @@ const useStyles = makeStyles(theme => ({
 
 export function SignUpComponent(props) {
     const classes = useStyles();
+    const alert = useAlert()
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -55,31 +54,65 @@ export function SignUpComponent(props) {
 
     function logIn(e) {
         e.preventDefault();
-        // firebase.auth().signInWithEmailAndPassword(email, password)
-        //     .then(res => {
-        //         props.history.push('/');
-        //     })
-        //     .catch(err => console.log(console.log(err)));
+        if (!validateForm()) {
+            console.log(validateForm())
+            return;
+        } else {
+            signIn(email, password);
+        }
+    }
+
+    const signIn = (email, password) => {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(result => {
+            var user = firebase.auth().currentUser;
+            user.updateProfile({
+                displayName: username
+            }).then(() => {
+                alert.success("Регистрация прошла успешно")
+            });
+        })
+        .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            alert.error(`${errorCode}: ${errorMessage}`);
+        });
     }
 
     const validateForm = () => {
-        if (password != confirmPassword) {
-            return false;
-        }
-
-
+        return [validateConfirmPassword(), validateFields(), validatePasswordLength()].every(Boolean);
     }
 
-    const validatePassword = () => {
-        return password.length < 6;
+    const validatePasswordLength = () => {
+        if (password.length < 6) {
+            alert.error("Пароль меньше 6ти символов");
+            setPassword("");
+        }
+        return password.length > 6;
+    }
+
+    const validateConfirmPassword = () => {
+        if (confirmPassword !== password) {
+            alert.error("Пароли не совпадают");
+            setPassword("");
+            setConfirmPassword("");
+        }
+        return confirmPassword === password;
+    }
+
+    const validateFields = () => {
+        const conditions = [username, email, password];
+        if (!conditions.every(Boolean)) {
+            alert.error("Не все поля заполнены");
+        }
+        return conditions.every(Boolean);
     }
 
     return (
-
         <div className={classes.root}>
             <div className={classes.formContainer}>
                 <Typography className={classes.title} component="h1" variant="h5">
-                    Sign Up
+                    Регистрация
                 </Typography>
                 <Container className={classes.form} noValidate>
                     <TextField
@@ -89,7 +122,7 @@ export function SignUpComponent(props) {
                         required
                         fullWidth
                         id="username"
-                        label="Name"
+                        label="Имя"
                         name="username"
                         onChange={(e) => setUsername(e.target.value)}
                     />
@@ -111,7 +144,7 @@ export function SignUpComponent(props) {
                         required
                         fullWidth
                         name="password"
-                        label="Password"
+                        label="Пароль"
                         type="password"
                         id="password"
                         autoComplete="current-password"
@@ -124,7 +157,7 @@ export function SignUpComponent(props) {
                         required
                         fullWidth
                         name="confirmPassword"
-                        label="Confirm Password"
+                        label="Подтвердить пароль"
                         type="password"
                         id="confirmPassword"
                         autoComplete="current-password"

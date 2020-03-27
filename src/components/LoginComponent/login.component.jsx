@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import firebase from 'firebase';
@@ -50,12 +47,40 @@ const useStyles = makeStyles(theme => ({
 export function LoginComponent(props) {
     const classes = useStyles();
     const alert = useAlert();
-    const [email, setEmail] = useState('sherstnev-serzh@mail.ru');
-    const [password, setPassword] = useState('13031989');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    function logIn(e) {
+    function logInHandler(e) {
         e.preventDefault();
-        alert.show("Hello")
+        if (!validateFields()) {
+            return
+        } else {
+            login(email, password)
+        }
+        
+    }
+
+    const login = (email, password) => {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(() => {
+            const user = firebase.auth().currentUser;
+            alert.success("Вход выполнен успешно")
+        })
+        .catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // ...
+          });
+    }
+
+    const validateFields = () => {
+        const areFieldsValid = [password, email].every(Boolean);
+        if (!areFieldsValid) {
+            alert.error("Поля не заполнены");
+        }
+
+        return areFieldsValid;
     }
 
     return (
@@ -63,7 +88,7 @@ export function LoginComponent(props) {
         <div className={classes.root}>
             <div className={classes.formContainer}>
                 <Typography className={classes.title} component="h1" variant="h5">
-                    Sign in
+                    Войти
                 </Typography>
                 <Container className={classes.form} noValidate>
                     <TextField
@@ -84,7 +109,7 @@ export function LoginComponent(props) {
                         required
                         fullWidth
                         name="password"
-                        label="Password"
+                        label="Пароль"
                         type="password"
                         id="password"
                         autoComplete="current-password"
@@ -96,7 +121,7 @@ export function LoginComponent(props) {
                         variant="contained"
                         color="primary"
                         className={classes.submit}
-                        onClick={logIn}
+                        onClick={logInHandler}
                     >
                         Sign In
                     </Button>
