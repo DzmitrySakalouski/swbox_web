@@ -8,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import firebase from 'firebase';
 import { Container } from '@material-ui/core';
-import { useAlert } from 'react-alert';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -47,15 +46,32 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-export function LoginComponent(props) {
+export function SignUpComponent(props) {
     const classes = useStyles();
-    const alert = useAlert();
-    const [email, setEmail] = useState('sherstnev-serzh@mail.ru');
-    const [password, setPassword] = useState('13031989');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     function logIn(e) {
         e.preventDefault();
-        alert.show("Hello")
+        // firebase.auth().signInWithEmailAndPassword(email, password)
+        //     .then(res => {
+        //         props.history.push('/');
+        //     })
+        //     .catch(err => console.log(console.log(err)));
+    }
+
+    const validateForm = () => {
+        if (password != confirmPassword) {
+            return false;
+        }
+
+
+    }
+
+    const validatePassword = () => {
+        return password.length < 6;
     }
 
     return (
@@ -63,9 +79,20 @@ export function LoginComponent(props) {
         <div className={classes.root}>
             <div className={classes.formContainer}>
                 <Typography className={classes.title} component="h1" variant="h5">
-                    Sign in
+                    Sign Up
                 </Typography>
                 <Container className={classes.form} noValidate>
+                    <TextField
+                        variant="outlined"
+                        value={username}
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="username"
+                        label="Name"
+                        name="username"
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
                     <TextField
                         variant="outlined"
                         value={email}
@@ -90,6 +117,19 @@ export function LoginComponent(props) {
                         autoComplete="current-password"
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <TextField
+                        variant="outlined"
+                        value={confirmPassword}
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="confirmPassword"
+                        label="Confirm Password"
+                        type="password"
+                        id="confirmPassword"
+                        autoComplete="current-password"
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
                     <Button
                         type="submit"
                         fullWidth
@@ -98,7 +138,7 @@ export function LoginComponent(props) {
                         className={classes.submit}
                         onClick={logIn}
                     >
-                        Sign In
+                        Sign Up
                     </Button>
 
                 </Container>
